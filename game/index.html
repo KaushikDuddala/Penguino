@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <script>
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        }
+        
+        let name = "";
+        function submitName(){
+            name = document.getElementsByName("name")[0].value;
+            if(name == undefined || name == "" || name == " "){
+                name = "Player"+getRandomInt(1000);
+            }else{
+                name = document.getElementsByName("name")[0].value;
+            }
+            console.log(name);
+            document.getElementsByClassName("title")[0].innerHTML = "Roll the dice, " + name+".";
+            document.getElementsByName("name")[0].style.display = "none";
+            document.getElementsByTagName("button")[0].innerHTML = "Roll"
+            document.getElementsByTagName("button")[0].setAttribute("onclick", "rollDice()");
+        }
+        function rollDice(){
+
+            fetch(`checkroll.js?name=${encodeURIComponent(name)}`).then(response =>{
+                if(response.status == 200){
+                    let dice = getRandomInt(3);
+            document.getElementsByClassName("title")[0].innerHTML = "You rolled a " + dice + ", " + name+".";
+                    const url = `data.js?dice=${dice}&name=${encodeURIComponent(name)}`;
+                    
+                    // Make the GET request using fetch
+                    fetch(url)
+                    .then(response => {
+                        if (response.ok) {
+                            // Successful response
+                            return response.json();
+                        } else {
+                            // Handle error response
+                            throw new Error('Request failed.');
+                        }
+                    })
+                    .then(data => {
+                        // Process the response data
+                        console.log(data);
+                    })
+                    .catch(error => {
+                        // Handle fetch error
+                        console.error(error);
+                    });   
+                }else{
+                    console.log(response.status)
+                }
+            })
+            
+        }
+    </script>
+    <style>
+        body{
+            background-color: black;
+        }
+        .title{
+            color:purple;
+            text-align: center;
+            font-size: 60px;
+        }
+        form{
+            text-align: center;
+        }
+        button{
+            text-align: center;
+            margin-left: 50%;
+            transform: translate(-50%, 0);
+            margin-top: 30px;
+            
+        }
+    </style>
+</head>
+<body>
+    <div class="name">
+        <h1 class="title">Choose your name.</h1>
+    </div>
+    <div>
+        <form>
+            <input type="text" name="name" id="name">
+        </form>
+        <button onclick="submitName()">Submit</button>
+    </div>
+</body>
+</html> 
